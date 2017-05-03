@@ -6,13 +6,13 @@ ARG BUILD_DATE
 ARG VERSION
 LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 
-# package version
-ENV NEXTCLOUD_VER="11.0.2"
+# package version
+ENV NEXTCLOUD_VER="11.0.3"
 
-# environment settings
+# environment settings
 ENV NEXTCLOUD_PATH="/config/www/nextcloud"
 
-# install build-dependencies
+# install build-dependencies
 RUN \
  apk add --no-cache --virtual=build-dependencies \
 	autoconf \
@@ -21,16 +21,31 @@ RUN \
 	g++ \
 	gcc \
 	make \
-	php7-dev \
 	re2c \
 	samba-dev \
 	zlib-dev && \
 
-# install runtime packages
+ apk add --no-cache --virtual=build-dependencies \
+	--repository http://nl.alpinelinux.org/alpine/edge/community \
+	php7-dev && \
+
+# install runtime packages
  apk add --no-cache \
 	curl \
 	ffmpeg \
 	libxml2 \
+	samba \
+	sudo \
+	tar \
+	unzip && \
+
+ apk add --no-cache \
+	--repository http://nl.alpinelinux.org/alpine/edge/main \
+	icu-libs \
+	libwebp && \
+
+ apk add --no-cache \
+	--repository http://nl.alpinelinux.org/alpine/edge/community \
 	php7-apcu \
 	php7-bz2 \
 	php7-ctype \
@@ -46,6 +61,7 @@ RUN \
 	php7-ldap \
 	php7-mbstring \
 	php7-mcrypt \
+	php7-memcached \
 	php7-pcntl \
 	php7-pdo_mysql \
 	php7-pdo_pgsql \
@@ -55,20 +71,12 @@ RUN \
 	php7-sqlite3 \
 	php7-xml \
 	php7-xmlreader \
-	php7-zip \
-	samba \
-	sudo \
-	tar \
-	unzip && \
+	php7-zip && \
 
- apk add --no-cache \
-	--repository http://nl.alpinelinux.org/alpine/edge/testing \
-	php7-memcached && \
-
-# fetch php smbclient source
+# fetch php smbclient source
  git clone git://github.com/eduardok/libsmbclient-php.git /tmp/smbclient && \
 
-# compile smbclient
+# compile smbclient
  cd /tmp/smbclient && \
  phpize7 && \
  ./configure \
@@ -76,24 +84,24 @@ RUN \
  make && \
  make install && \
 
-# uninstall build-dependencies
+# uninstall build-dependencies
  apk del --purge \
 	build-dependencies && \
 
-# configure php and nginx for nextcloud
+# configure php and nginx for nextcloud
  echo "extension="smbclient.so"" > /etc/php7/conf.d/00_smbclient.ini && \
  sed -i \
  's/;always_populate_raw_post_data = -1/always_populate_raw_post_data = -1/g' \
 	/etc/php7/php.ini && \
  echo "env[PATH] = /usr/local/bin:/usr/bin:/bin" >> /etc/php7/php-fpm.conf && \
 
-# cleanup
+# cleanup
  rm -rf \
 	/tmp/*
 
-# copy local files
+# copy local files
 COPY root/ /
 
-# ports and volumes
+# ports and volumes
 EXPOSE 443
 VOLUME /config /data
