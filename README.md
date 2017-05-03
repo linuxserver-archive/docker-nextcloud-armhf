@@ -81,4 +81,5 @@ Please note you will need a MySQL/MariaDB or other backend database to set this 
 
 ## Versions
 
++ **03.05.17:** Update to php 7.1x.
 + **07.03.17:** Initial Release
