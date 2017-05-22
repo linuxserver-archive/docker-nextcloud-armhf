@@ -67,6 +67,8 @@ Access the webui at `<your-ip>:443`, for more information check out [Nextcloud][
 
 Please note you will need a MySQL/MariaDB or other backend database to set this up.  Also please look [here](https://docs.nextcloud.com/server/11/admin_manual/installation/system_requirements.html#database-requirements-for-mysql-mariadb) for how to configure your database with regard to binlog format and installation.
 
+If updating to nextcloud 12 you will need to comment out line `add_header X-Frame-Options "SAMEORIGIN";` in the file /config/nginx/site-confs/default
+
 ## Info
 
 * Monitor the logs of the container in realtime `docker logs -f nextcloud`.
@@ -81,5 +83,6 @@ Please note you will need a MySQL/MariaDB or other backend database to set this 
 
 ## Versions
 
++ **22.05.17:** Update to nextcloud 12.0, adding required dependecies and note about commenting out SAMEORIGIN; line.
 + **03.05.17:** Update to php 7.1x.
 + **07.03.17:** Initial Release
